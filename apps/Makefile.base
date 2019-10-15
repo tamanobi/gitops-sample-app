@@ -1,0 +1,30 @@
+BUILD_FILES  := .build
+REVISION     := $(shell git rev-parse --short HEAD)
+ORIGIN       := $(shell git remote get-url origin)
+TAG          := $(REVISION)
+REGISTRY     := your.docker.registry.local
+
+.PHONY: build
+build: $(BUILD_FILES)
+
+# .buildを取り除いているのは循環参照回避のため
+.build: Dockerfile $(shell find . -type f -not -name ".build")
+	docker build \
+        --build-arg GIT_REVISION=$(REVISION) \
+        --build-arg GIT_ORIGIN=$(ORIGIN) \
+        --build-arg IMAGE_NAME=$(REGISTRY)/$(NAME) \
+        --label GIT_REVISION=$(REVISION) \
+        --label GIT_ORIGIN=$(ORIGIN) \
+        --label IMAGE_NAME=$(REGISTRY)/$(NAME) \
+		-t $(REGISTRY)/$(NAME):$(TAG) .
+	docker inspect --format="{{range .RepoTags}}{{.}}{{end}}" $(REGISTRY)/$(NAME):$(TAG) > .build
+
+.PHONY: push
+push: $(BUILD_FILES)
+	# TODO: 動作するかどうか検証
+	docker push $(REGISTRY)/$(NAME):$$TAG
+
+.PHONY: clean
+clean: $(BUILD_FILES)
+	cat $^ | xargs -I {} docker rmi {}
+	rm -f $^
