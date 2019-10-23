@@ -3,8 +3,8 @@
 2. GitOpsの検証(こちらはアプリリポジトリ)
 
 # TODO
-- リポジトリのmasterへマージしたときに、BuildしコンテナレジストリにPushする
-- Pushしたあと、configリポジトリにPull Requestが自動生成される
+- [ ] リポジトリのmasterへマージしたときに、BuildしコンテナレジストリにPushする
+- [x] Pushしたあと、configリポジトリにPull Requestが自動生成される
 
 # 注意
 GNU Makeのバージョンは、3.81。
